@@ -12,3 +12,7 @@ Casino game built for a statistics class. Meant to be played with 2 people. Curr
   - **Team Slots:** On either side of the center slot are player slots colored either blue or red. Based on which one you land in decides where money goes.
 
 When you land in the **Team Slots** you either are on your own side or on the opponents side. You want to land in their slots and when you do you get part of their bet. When you land on your side they get a percentage of your bet. The Max amount that can be traded in game is 100% or 50% per ball in a slot. The rates change based off distance from the center slot.
+
+### Controls:
+- Each player has one boost while inbetween the yellow lines. This boost can go in either direction. Team red uses arrow keys (left and right). Team blue uses keys 'a' and 'd'.
+- Space bar to drop both balls and start round.
