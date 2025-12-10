@@ -16,3 +16,7 @@ When you land in the **Team Slots** you either are on your own side or on the op
 ### Controls:
 - Each player has one boost while inbetween the yellow lines. This boost can go in either direction. Team red uses arrow keys (left and right). Team blue uses keys 'a' and 'd'.
 - Space bar to drop both balls and start round.
+
+### House Options:
+The house can manually set the balance of each players pool of currency. 
+You can also set the bet amount per ball.
