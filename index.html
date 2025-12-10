@@ -338,11 +338,35 @@
           dropBothBalls();
       } else if (e.code === 'ArrowLeft') {
           e.preventDefault();
-          boost('left');
+          boost('b_left');
           updateUI();
       } else if (e.code === 'ArrowRight') {
           e.preventDefault();
-          boost('right');
+          boost('b_right');
+          updateUI();
+      } else if (e.code === 'ArrowUp') {
+          e.preventDefault();
+          boost('b_up');
+          updateUI();
+      } else if (e.code === 'ArrowDown') {
+          e.preventDefault();
+          boost('b_down');
+          updateUI();
+      } else if (e.code === 'KeyA') {
+          e.preventDefault();
+          boost('r_left');
+          updateUI();
+      } else if (e.code === 'KeyD') {
+          e.preventDefault();
+          boost('r_right');
+          updateUI();
+      } else if (e.code === 'KeyW') {
+          e.preventDefault();
+          boost('r_up');
+          updateUI();
+      } else if (e.code === 'KeyS') {
+          e.preventDefault();
+          boost('r_down');
           updateUI();
       }
   });
@@ -606,13 +630,43 @@
       for (const ball of activeBalls) {
           if (!ball.active || boostUsed[ball.id] || ball.y > BOOST_LINE || ball.y < BOOST_LINE_UPPER) continue;
 
-          if (direction === 'left' && ball.team === 'blue') {
+          if (direction === 'b_left' && ball.team === 'blue') {
               ball.vx -= BOOST_FORCE;
               boostUsed[ball.id] = true;
               showMessage('BOOST!', 'blue');
               break;
-          } else if (direction === 'right' && ball.team === 'red') {
+          } else if (direction === 'b_right' && ball.team === 'blue') {
               ball.vx += BOOST_FORCE;
+              boostUsed[ball.id] = true;
+              showMessage('BOOST!', 'blue');
+              break;
+          } else if (direction === 'b_up' && ball.team === 'blue') {
+              ball.vy -= BOOST_FORCE;
+              boostUsed[ball.id] = true;
+              showMessage('BOOST!', 'blue');
+              break;
+          } else if (direction === 'b_down' && ball.team === 'blue') {
+              ball.vy += BOOST_FORCE;
+              boostUsed[ball.id] = true;
+              showMessage('BOOST!', 'blue');
+              break;
+          } else if (direction === 'r_left' && ball.team === 'red') {
+              ball.vx -= BOOST_FORCE;
+              boostUsed[ball.id] = true;
+              showMessage('BOOST!', 'red');
+              break;
+          } else if (direction === 'r_right' && ball.team === 'red') {
+              ball.vx += BOOST_FORCE;
+              boostUsed[ball.id] = true;
+              showMessage('BOOST!', 'red');
+              break;
+          } else if (direction === 'r_up' && ball.team === 'red') {
+              ball.vy -= BOOST_FORCE;
+              boostUsed[ball.id] = true;
+              showMessage('BOOST!', 'red');
+              break;
+          } else if (direction === 'r_down' && ball.team === 'red') {
+              ball.vy += BOOST_FORCE;
               boostUsed[ball.id] = true;
               showMessage('BOOST!', 'red');
               break;
