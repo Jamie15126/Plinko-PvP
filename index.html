@@ -109,6 +109,7 @@
     .set-bal-btn {
         background: linear-gradient(135deg, #e67e22, #d35400);
         margin-top: 10px;
+        margin-bottom: 20px;
     }
     .info {
         background: rgba(255,255,255,0.1);
@@ -193,6 +194,22 @@
         padding: 5px;
         border-radius: 5px;
     }
+    .house-bal {
+        background: linear-gradient(135deg, #f39c12, #f1c40f);
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .house-bal .amount {
+        font-size: 32px;
+        margin-top: 20px;
+        text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body>
@@ -235,7 +252,7 @@
     <button class="boost-btn-red" onclick="boost('right')" id="redBoostBtn" disabled>Boost Right (Red) →</button>
     <button class="boost-btn-blue" onclick="boost('left')" id="blueBoostBtn" disabled>← Boost Left (Blue)</button>
   </div>
-
+  <!--
   <div class="info">
     <div class="house-controls"><strong>How to Play:</strong></div>
     <div><strong>Controls:</strong> Space = Start Round, Left Arrow = Boost Left, Right Arrow = Boost Right</div>
@@ -245,6 +262,7 @@
     <div>• <strong>Landing on opponent's side:</strong> Take % of their bet | <strong>Your side:</strong> Give % of your bet</div>
     <div>• Max take/give is 50% each, total ≤100% of bet</div>
   </div>
+  -->
 </div>
 
 <div class="house">
@@ -261,6 +279,10 @@
     <input type="number" id="house-amount" value="100" min="1" max="1000">
   </div>
   <button class="set-bal-btn" onclick="setBalance()" id="setBalBtn">Set Balance</button>
+  <div class="house-bal">
+    <div>House Balance</div>
+    <div class="amount" id="house-bal">$0</div>
+  </div>
 </div>
 
 <script>
@@ -286,9 +308,10 @@
   let boostUsed = {};
   let currentBet = 0;
 
-  let redBalance = 1000;
-  let blueBalance = 1000;
+  let redBalance = 500;
+  let blueBalance = 500;
   let pot = 0;
+  let houseTotal = 0;
 
   let lastTime = 0;
   let accumulatedTime = 0;
@@ -448,7 +471,8 @@
           pot = 0;
       } else if (slot.type === 'center') {
           const playerReturn = Math.floor(bet * 0.5);
-          const potAmount = Math.floor(bet * 0.40);
+          const potAmount = Math.floor(bet * 0.49);
+          const houseAmount = Math.floor(bet * 0.01);
 
           if (team === 'red') {
               redBalance += playerReturn;
@@ -456,6 +480,7 @@
               blueBalance += playerReturn;
           }
           pot += potAmount;
+          houseTotal += houseAmount;
 
           showMessage(`${team.toUpperCase()} Center! +$${playerReturn} (Pot +$${potAmount})`, 'neutral');
       } else if (slot.type === 'points') {
@@ -617,8 +642,8 @@
   function reset() {
       activeBalls = [];
       boostUsed = {};
-      redBalance = 1000;
-      blueBalance = 1000;
+      redBalance = 500;
+      blueBalance = 500;
       pot = 0;
       updateUI();
   }
@@ -639,6 +664,7 @@
       document.getElementById('redBalance').textContent = '$' + redBalance;
       document.getElementById('blueBalance').textContent = '$' + blueBalance;
       document.getElementById('potAmount').textContent = '$' + pot;
+      document.getElementById('house-bal').textContent = '$' + houseTotal;
 
       const bet = Math.max(1, parseInt(document.getElementById('betAmount').value) || 100);
       const dropBtn = document.getElementById('dropBtn');
