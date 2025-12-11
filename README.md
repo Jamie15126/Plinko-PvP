@@ -30,3 +30,6 @@ You can also set the bet amount per ball.
 - Color themes? Likely would be stored in a .yml file and referenced by the HTML.
 - Sounds, musics and effects.
 - Better Horizontal Screen Usage. No plans for a mobile version.
+
+### Warnings: 
+- Sounds might not work depending on browser settings.
