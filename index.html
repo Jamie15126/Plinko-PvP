@@ -487,16 +487,16 @@
 
       if (slot.type === 'jackpot') {
           if (team === 'red') {
-              redBalance += pot;
+              redBalance += pot + bet;
           } else {
-              blueBalance += pot;
+              blueBalance += pot + bet;
           }
           showMessage(`${team.toUpperCase()} WINS THE JACKPOT! +$${pot}`, slot.team);
           pot = 0;
       } else if (slot.type === 'center') {
           const playerReturn = Math.floor(bet * 0.5);
-          const potAmount = Math.floor(bet * 0.49);
-          const houseAmount = Math.floor(bet * 0.01);
+          const potAmount = Math.floor(bet * 0.45);
+          const houseAmount = Math.floor(bet * 0.05);
 
           if (team === 'red') {
               redBalance += playerReturn;
