@@ -210,6 +210,64 @@
         margin-top: 20px;
         text-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
+
+    /* Container positioning */
+    #audio-slider-container {
+        position: fixed;
+        left: 50px;
+        bottom: 50px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 10px;
+        background: rgba(0,0,0,0.35);
+        border-radius: 8px;
+        backdrop-filter: blur(6px);
+    }
+
+    /* Label and number styling */
+    .audio-label {
+        font-size: 14px;
+        color: white;
+        font-weight: 600;
+    }
+
+    #audio-value {
+        font-size: 14px;
+        color: white;
+        font-weight: 500;
+    }
+
+    /* Vertical slider styling */
+    #audio-slider {
+        writing-mode: bt-lr;        /* vertical orientation */
+        -webkit-appearance: slider-vertical;
+        width: 20px;
+        height: 150px;
+    }
+
+    /* Make it easier to use on mobile */
+    @media (max-width: 600px) {
+        #audio-slider-container {
+            left: 30px;
+            bottom: 30px;
+            padding: 8px;
+            gap: 6px;
+        }
+
+        #audio-slider {
+            height: 200px;
+            width: 24px;
+        }
+
+        .audio-label,
+        #audio-value {
+            font-size: 16px;
+        }
+    }
+
   </style>
 </head>
 <body>
@@ -248,10 +306,12 @@
     <button class="reset-btn" onclick="reset()">Reset Game</button>
   </div>
 
+  <!--
   <div class="controls">
     <button class="boost-btn-red" onclick="boost('right')" id="redBoostBtn" disabled>Boost Right (Red) →</button>
     <button class="boost-btn-blue" onclick="boost('left')" id="blueBoostBtn" disabled>← Boost Left (Blue)</button>
   </div>
+  -->
   <!--
   <div class="info">
     <div class="house-controls"><strong>How to Play:</strong></div>
@@ -285,6 +345,13 @@
   </div>
 </div>
 
+<div id="audio-slider-container">
+  <div class="audio-label">Volume</div>
+  <input id="audio-slider" type="range" min="0" max="100" value="100" orient="vertical">
+  <div id="audio-value">100</div>
+</div>
+
+
 <script>
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
@@ -302,6 +369,25 @@
   const BOOST_LINE = 350;
   const BOOST_LINE_UPPER = 150;
   const BOOST_FORCE = 8 * (60 / FIXED_FPS);
+
+
+  // ============================= MEDIA =======================================
+  const audio_plink = new Audio("sounds/plink.mp3");
+  const audio_plink_small = new Audio("sounds/plink_small.mp3");
+  // audio_plink.play();
+
+  let masterVolume = 1.0;
+
+  const audioSlider = document.getElementById("audio-slider");
+  const audioValue = document.getElementById("audio-value");
+
+  audioSlider.addEventListener("input", () => {
+      masterVolume = audioSlider.value / 100;
+      audioValue.textContent = audioSlider.value;
+  });
+
+  // ===========================================================================
+
 
   const pegs = [];
   let activeBalls = [];
@@ -436,6 +522,23 @@
                   const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
                   this.vx = Math.cos(angle) * speed * BOUNCE;
                   this.vy = Math.sin(angle) * speed * BOUNCE;
+
+                  // --- AUDIO CONTROL LOGIC (more aggressive falloff) ---
+                  const impactThreshold = 0.5;        // cutoff for silence
+                  const maxSpeed = 10;                // speed that corresponds to full volume
+
+                  // Normalized speed (0–1)
+                  let t = Math.min(1, Math.max(0, speed / maxSpeed));
+
+                  // Quadratic falloff (aggressive decrease)
+                  // t^2 grows slow at low speeds and ramps up late
+                  const volume = t * t;
+
+                  if (speed >= impactThreshold) {
+                      audio_plink_small.volume = volume * masterVolume;
+                      audio_plink_small.currentTime = 0;
+                      audio_plink_small.play();
+                  }
               }
           });
 
@@ -468,7 +571,7 @@
               }
           }
 
-          updateBoostButtons();
+          // updateBoostButtons();
       }
 
       draw() {
@@ -672,7 +775,7 @@
               break;
           }
       }
-      updateBoostButtons();
+      // updateBoostButtons();
   }
 
   function updateBoostButtons() {
@@ -689,9 +792,10 @@
           }
       }
 
-      document.getElementById('redBoostBtn').disabled = !canBoostRed;
-      document.getElementById('blueBoostBtn').disabled = !canBoostBlue;
+    document.getElementById('redBoostBtn').disabled = !canBoostRed;
+    document.getElementById('blueBoostBtn').disabled = !canBoostBlue;
   }
+
 
   function reset() {
       activeBalls = [];
@@ -730,8 +834,8 @@
       dropBtn.innerHTML = `Start Round ($<span id="betDisplay">${bet}</span> each)`;
 
       if (activeBalls.length === 0) {
-          document.getElementById('redBoostBtn').disabled = true;
-          document.getElementById('blueBoostBtn').disabled = true;
+          //document.getElementById('redBoostBtn').disabled = true;
+          //document.getElementById('blueBoostBtn').disabled = true;
 
           if (isAnimationRunning) {
               stopAnimation();
