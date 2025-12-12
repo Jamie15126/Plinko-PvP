@@ -1,0 +1,288 @@
+body {
+    margin: 0;
+    padding: 1vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 98vh;
+    background: #1e293b;
+    font-family: 'Arial', sans-serif;
+}
+
+#canvas {
+    border: 10px solid rgba(15,23,40,1);
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    background: rgba(15,23,40,1);
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(15px, 2vh, 20px);
+    align-items: center;
+}
+
+.title {
+    color: white;
+    font-size: clamp(30px, 4vw, 50px);
+    font-weight: bold;
+    border: 0px solid #000;
+    border-radius: 20px;
+    text-shadow: 0 4px 20px rgba(0,0,0,1);
+    padding: clamp(10px, 1vh, 15px);
+    margin: clamp(5px, 1vh, 10px);
+}
+
+.teams {
+    display: flex;
+    gap: clamp(30px, 3vw, 40px);
+    width: clamp(500px, 50vw, 600px);
+    justify-content: space-between;
+}
+
+.team {
+    flex: 1;
+    padding: clamp(10px, 1.5vh, 15px);
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.team-red {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+}
+
+.team-blue {
+    background: linear-gradient(135deg, #4ecdc4, #44a3d5);
+}
+
+.team h2 {
+    margin: 0 0 8px 0;
+    font-size: clamp(16px, 1.6vw, 20px);
+    text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.team .balance {
+    font-size: clamp(20px, 2vw, 26px);
+    font-weight: bold;
+    margin: 8px 0;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.team .label {
+    font-size: clamp(11px, 1.1vw, 13px);
+    opacity: 0.9;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.pot {
+    background: linear-gradient(135deg, #f39c12, #f1c40f);
+    padding: clamp(10px, 1.5vh, 15px);
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    font-size: clamp(14px, 1.4vw, 16px);
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.pot .amount {
+    font-size: clamp(20px, 2vw, 26px);
+    margin-top: clamp(10px, 1.5vh, 15px);
+    text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.controls {
+    display: flex;
+    gap: clamp(12px, 1.5vw, 15px);
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+button {
+    padding: clamp(10px, 1.2vh, 12px) clamp(20px, 2vw, 24px);
+    font-size: clamp(14px, 1.4vw, 16px);
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.drop-btn {
+    background: linear-gradient(135deg, #41a945 0%, #acfa70 100%);
+}
+
+.boost-btn-red {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+}
+
+.boost-btn-blue {
+    background: linear-gradient(135deg, #4ecdc4, #44a3d5);
+}
+
+.reset-btn {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+}
+
+.set-bal-btn {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.bet-input {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: rgba(255,255,255,0.1);
+    padding: clamp(8px, 1vh, 10px) clamp(16px, 1.8vw, 20px);
+    border-radius: 8px;
+}
+
+.bet-input input {
+    width: clamp(80px, 8vw, 100px);
+    padding: clamp(6px, 0.8vh, 8px);
+    font-size: clamp(14px, 1.4vw, 16px);
+    border: 2px solid white;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.bet-input label {
+    color: white;
+    font-weight: bold;
+    font-size: clamp(14px, 1.4vw, 16px);
+}
+
+.info {
+    background: rgba(255,255,255,0.1);
+    padding: clamp(12px, 1.5vh, 15px) clamp(20px, 2.5vw, 25px);
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    max-width: clamp(500px, 50vw, 600px);
+    margin: clamp(50px, 6vh, 75px);
+}
+
+.house {
+    position: fixed;
+    right: -350px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.1);
+    padding: clamp(12px, 1.5vh, 15px) clamp(20px, 2.5vw, 25px);
+    border-radius: 10px 0 0 10px;
+    backdrop-filter: blur(10px);
+    width: clamp(250px, 20vw, 300px);
+    color: white;
+    transition: right 1.9s ease;
+    z-index: 1000;
+}
+
+.house.open {
+    right: 0;
+}
+
+.house-tab {
+    position: absolute;
+    left: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, #f39c12, #f1c40f);
+    color: white;
+    padding: clamp(12px, 1.5vh, 15px) clamp(8px, 1vw, 10px);
+    border-radius: 10px 0 0 10px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: clamp(12px, 1.2vw, 14px);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    box-shadow: -4px 0 15px rgba(0,0,0,0.3);
+    transition: left 0.3s ease;
+}
+
+.house-tab:hover {
+    background: linear-gradient(135deg, #e67e22, #e8b84d);
+}
+
+.house-controls {
+    font-size: clamp(20px, 2vw, 24px);
+    font-weight: bold;
+    margin: clamp(15px, 2vh, 20px);
+}
+
+.house-bal {
+    background: linear-gradient(135deg, #f39c12, #f1c40f);
+    padding: clamp(15px, 2vh, 20px);
+    border-radius: 10px;
+    color: white;
+    text-align: center;
+    font-size: clamp(18px, 1.8vw, 20px);
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.house-bal .amount {
+    font-size: clamp(26px, 2.5vw, 32px);
+    margin-top: clamp(15px, 2vh, 20px);
+    text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+#audio-slider-container {
+    position: fixed;
+    left: clamp(30px, 3vw, 50px);
+    bottom: clamp(30px, 3vh, 50px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    background: rgba(0,0,0,0.35);
+    border-radius: 8px;
+    backdrop-filter: blur(6px);
+}
+
+.audio-label {
+    font-size: clamp(12px, 1.2vw, 14px);
+    color: white;
+    font-weight: 600;
+}
+
+#audio-value {
+    font-size: clamp(12px, 1.2vw, 14px);
+    color: white;
+    font-weight: 500;
+}
+
+#audio-slider {
+    writing-mode: bt-lr;
+    -webkit-appearance: slider-vertical;
+    width: 20px;
+    height: clamp(120px, 12vh, 150px);
+}

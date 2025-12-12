@@ -2,7 +2,7 @@
 
 ## Play here: https://jamie15126.github.io/Plinko-PvP/
 
-Casino game built for a statistics class. Meant to be played with 2 people. Currently programmed with a single HTML file.
+Casino game built for a statistics class. Meant to be played with 2 people.
 
 
 ### Instructions: 
