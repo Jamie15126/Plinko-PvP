@@ -25,15 +25,18 @@ When you land in the **Team Slots** you either are on your own side or on the op
 The house can manually set the balance of each players pool of currency. 
 You can also set the bet amount per ball.
 
+### Exporting Data
+In the house controls tab there is an Export Data button. It generates a CSV file with the format of [Round Number] [Team] [Slot] [Bet]
+
 ### Features Coming Soon:
 - UI Element to change number of boosts usable per round.
 - Color themes? Likely would be stored in a .yml file and referenced by the HTML.
-- Sounds, musics and effects.
 - Better Horizontal Screen Usage. No plans for a mobile version.
 - Would be interesting to use something like this: https://github.com/plinko-team/plinko
 
 ### Warnings: 
 - Sounds might not work depending on browser settings.
+- Rampant } else if ( statements currently cus optimization is for people with slow computers (I'm not good at javascript)
 
 ### Credits:
 - The concept and design 100% by me. Anyone is free to use this however they wish under the condition that credit of the original Player vs Player style of plinko is award to Jamie.
