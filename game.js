@@ -2,11 +2,11 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 let canvasScale = 1;
-const BASE_WIDTH = 600;
+const BASE_WIDTH = 675;
 const BASE_HEIGHT = 675;
 const slotBounces = [];
 
-canvas.width = 600;
+canvas.width = 675;
 canvas.height = 675;
 
 const FIXED_FPS = 60;
@@ -15,8 +15,8 @@ const GRAVITY = 0.4 * (60 / FIXED_FPS);
 const BOUNCE = 0.6;
 const FRICTION = 0.98;
 const PEG_RADIUS = 5;
-const BALL_RADIUS = 8;
-const BOOST_LINE = 350;
+const BALL_RADIUS = 10;
+const BOOST_LINE = 300;
 const BOOST_LINE_UPPER = 150;
 const BOOST_FORCE = 8 * (60 / FIXED_FPS);
 
@@ -177,10 +177,10 @@ document.getElementById('betAmount').addEventListener('input', function() {
 });
 
 function initPegs() {
-    const rows = 12;
-    const startY = 100;
-    const rowSpacing = 45;
-    const pegSpacing = 45;
+    const rows = 10;
+    const startY = 90;
+    const rowSpacing = 53;
+    const pegSpacing = 57;
 
     for (let row = 0; row < rows; row++) {
         const pegsInRow = row + 3;
@@ -254,6 +254,8 @@ class Ball {
                 this.y = targetY;
 
                 const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                const minSpeed = 2; // tweak to control how fast balls slide off
+                const newSpeed = Math.max(speed * BOUNCE, minSpeed);
                 this.vx = Math.cos(angle) * speed * BOUNCE;
                 this.vy = Math.sin(angle) * speed * BOUNCE;
 
@@ -601,12 +603,14 @@ function updateUI() {
 
     dropBtn.innerHTML = `Start Round ($<span id="betDisplay">${bet}</span> each)`;
 
-    if (activeBalls.length === 0) {
+    // Only stop animation if no active balls AND no active slot bounces
+    if (activeBalls.length === 0 && slotBounces.length === 0) {
         if (isAnimationRunning) {
             stopAnimation();
         }
     }
 }
+
 
 function resizeCanvas() {
   const targetHeight = window.innerHeight * 0.55;
@@ -652,7 +656,7 @@ function drawBoostLine() {
 
     ctx.fillStyle = 'rgba(255, 255, 0, 0.7)';
     ctx.font = 'bold 14px Arial';
-    ctx.fillText('', 50, BOOST_LINE - 5);
+    ctx.fillText('', 50, BOOST_LINE - 10);
 }
 
 function drawBoostLineUpper() {
@@ -668,29 +672,53 @@ function drawBoostLineUpper() {
     ctx.fillStyle = 'rgba(255, 255, 0, 0.7)';
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'left';
-    ctx.fillText('BOOST ZONE', 10, BOOST_LINE_UPPER - 5);
+    ctx.fillText('BOOST ZONE', 10, BOOST_LINE_UPPER - 10);
+}
+
+function darkenHexColor(hex, factor) {
+    // factor = 0.1 means 10% darker, 0.3 = 30% darker
+    let r = parseInt(hex.slice(1, 3), 16);
+    let g = parseInt(hex.slice(3, 5), 16);
+    let b = parseInt(hex.slice(5, 7), 16);
+
+    r = Math.floor(r * (1 - factor));
+    g = Math.floor(g * (1 - factor));
+    b = Math.floor(b * (1 - factor));
+
+    // ensure two-digit hex
+    const rr = r.toString(16).padStart(2, '0');
+    const gg = g.toString(16).padStart(2, '0');
+    const bb = b.toString(16).padStart(2, '0');
+
+    return `#${rr}${gg}${bb}`;
 }
 
 function drawSlots() {
   const slotHeight = 50;
-  const slotY = canvas.height - slotHeight;
-  const slotWidth = canvas.width / slotConfig.length;
+  const slotY = canvas.height - slotHeight - 20;
+  const slotWidth = canvas.width / slotConfig.length - 4;
   const cornerRadius = 8;
 
   slotConfig.forEach((slot, i) => {
-      const x = i * slotWidth;
+      const x = i * slotWidth + 24;
       const cx = x + slotWidth / 2;
 
       let bounceOffset = 0;
-      const bounce = slotBounces.find(b => b.index === i);
-      if (bounce) {
-          const elapsed = Date.now() - bounce.startTime;
-          const duration = 300;
-          if (elapsed < duration) {
-              const progress = elapsed / duration;
-              bounceOffset = Math.sin(progress * Math.PI) * 10;
-          } else {
-              slotBounces.splice(slotBounces.indexOf(bounce), 1);
+
+      // Iterate over all bounces and apply them to this slot
+      for (let j = slotBounces.length - 1; j >= 0; j--) {
+          const bounce = slotBounces[j];
+          if (bounce.index === i) {
+              const elapsed = Date.now() - bounce.startTime;
+              const duration = 200; // Duration of bounce effect
+
+              if (elapsed < duration) {
+                  const progress = elapsed / duration;
+                  bounceOffset += -Math.sin(progress * Math.PI) * 5; // Accumulate bounce offsets
+              } else {
+                  // If bounce is complete, remove it
+                  slotBounces.splice(j, 1);
+              }
           }
       }
 
@@ -703,6 +731,10 @@ function drawSlots() {
           bgColor = slot.team === 'red' ? '#aa4444' : '#2e7d79';
       }
 
+      ctx.fillStyle = darkenHexColor(bgColor, 0.3);;
+      roundRect(ctx, x + 2, slotY + 3 - (bounceOffset / 2), slotWidth - 4, slotHeight - 3, cornerRadius);
+      ctx.fill();
+
       ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
       roundRect(ctx, x + 2, slotY + 3 - bounceOffset, slotWidth - 4, slotHeight - 3, cornerRadius);
       ctx.fill();
@@ -711,10 +743,10 @@ function drawSlots() {
       roundRect(ctx, x + 2, slotY - bounceOffset, slotWidth - 4, slotHeight - 6, cornerRadius);
       ctx.fill();
 
-      ctx.strokeStyle = '#1f2937';
-      ctx.lineWidth = 2;
-      roundRect(ctx, x + 2, slotY - bounceOffset, slotWidth - 4, slotHeight - 6, cornerRadius);
-      ctx.stroke();
+      //ctx.strokeStyle = '#1f2937';
+      //ctx.lineWidth = 2;
+      //roundRect(ctx, x + 2, slotY - bounceOffset, slotWidth - 4, slotHeight - 6, cornerRadius);
+      //ctx.stroke();
 
       ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'center';
