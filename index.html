@@ -17,10 +17,10 @@
     }
 
     #canvas {
-        border: 4px solid #fff;
+        border: 10px solid rgba(15,23,40,1); /#334155;
         border-radius: 10px;
         box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        background: #1a1a2e;
+        background: rgba(15,23,40,1);
         /* Canvas will be sized by JavaScript */
     }
 
@@ -405,6 +405,7 @@
   // ============================= MEDIA =======================================
   const audio_plink = new Audio("sounds/plink.mp3");
   const audio_plink_small = new Audio("sounds/plink_small.mp3");
+  const audio_plink_small2 = new Audio("sounds/plink_small2.mp3");
   // audio_plink.play();
 
   let masterVolume = 1.0;
@@ -416,6 +417,20 @@
       masterVolume = audioSlider.value / 100;
       audioValue.textContent = audioSlider.value;
   });
+
+  function playRandomPlink() {
+    let sound;
+
+    // 50/50 chance – adjust if desired
+    if (Math.random() < 0.5) {
+        sound = audio_plink_small.cloneNode();       // ensures clean replay
+    } else {
+        sound = audio_plink_small2.cloneNode();
+    }
+
+    sound.volume = masterVolume;
+    sound.play();
+}
 
   // ===========================================================================
 
@@ -573,7 +588,7 @@
                   if (speed >= impactThreshold) {
                       audio_plink_small.volume = volume * masterVolume;
                       audio_plink_small.currentTime = 0;
-                      audio_plink_small.play();
+                      playRandomPlink();
                   }
               }
           });
@@ -615,8 +630,8 @@
           ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
           ctx.fillStyle = this.color;
           ctx.fill();
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-          ctx.lineWidth = 2;
+          ctx.strokeStyle = this.color;
+          ctx.lineWidth = 3;
           ctx.stroke();
       }
   }
@@ -630,7 +645,7 @@
           } else {
               blueBalance += pot + bet;
           }
-          showMessage(`${team.toUpperCase()} WINS THE JACKPOT! +$${pot}`, slot.team);
+          showMessage(`JACKPOT! +$${pot}`, slot.team);
           pot = 0;
       } else if (slot.type === 'center') {
           const playerReturn = Math.floor(bet * 0.5);
@@ -645,7 +660,7 @@
           pot += potAmount;
           houseTotal += houseAmount;
 
-          showMessage(`${team.toUpperCase()} Center! +$${playerReturn} (Pot +$${potAmount})`, 'neutral');
+          showMessage(`+$${potAmount}`, 'neutral');
       } else if (slot.type === 'points') {
           const isOwnSide = (team === slot.team);
 
@@ -664,7 +679,7 @@
               const potContribution = Math.floor(bet * 0.05);
               pot += potContribution;
 
-              showMessage(`${team.toUpperCase()} keeps $${keepAmount}, gives $${giveAmount}`, team);
+              showMessage(`${team.toUpperCase()} gives $${giveAmount}`, team);
           } else {
               const takeAmount = Math.floor(bet * slot.takePercent / 100);
 
@@ -687,7 +702,7 @@
               const potContribution = Math.floor(bet * 0.05);
               pot += potContribution;
 
-              showMessage(`${team.toUpperCase()} takes $${takeAmount} from opponent!`, team);
+              showMessage(`${team.toUpperCase()} takes $${takeAmount}`, team);
           }
       }
 
@@ -711,14 +726,16 @@
 
       if (team === 'red') {
           messageDiv.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a6f)';
-          messageDiv.style.transform = 'translate(100%, -50%)';
+          messageDiv.style.transform = 'translate(150%, -400%)';
           messageDiv.style.padding = '20px 30px';
       } else if (team === 'blue') {
           messageDiv.style.background = 'linear-gradient(135deg, #4ecdc4, #44a3d5)';
-          messageDiv.style.transform = 'translate(-200%, -50%)';
+          messageDiv.style.transform = 'translate(-250%, -400%)';
           messageDiv.style.padding = '20px 30px';
       } else {
-          messageDiv.style.background = 'linear-gradient(135deg, #f39c12, #f1c40f)';
+          messageDiv.style.background = 'rgba(0,0,0,0)'; //'linear-gradient(135deg, #f39c12, #f1c40f)';
+          messageDiv.style.boxShadow = '0 10px 40px rgba(0,0,0,0.0)';
+          messageDiv.style.transform = 'translate(-50%, -450%)';
       }
 
       document.body.appendChild(messageDiv);
@@ -908,10 +925,10 @@
       pegs.forEach(peg => {
           ctx.beginPath();
           ctx.arc(peg.x, peg.y, peg.radius, 0, Math.PI * 2);
-          ctx.fillStyle = '#4ecdc4';
+          ctx.fillStyle = '#FFFFFF';
           ctx.fill();
-          ctx.strokeStyle = '#defa70';
-          ctx.lineWidth = 2;
+          ctx.strokeStyle = '#FFFFFF';
+          ctx.lineWidth = 1;
           ctx.stroke();
       });
   }
@@ -965,7 +982,7 @@
           ctx.fillStyle = bgColor;
           ctx.fillRect(i * slotWidth, slotY, slotWidth, slotHeight);
 
-          ctx.strokeStyle = '#ffffff';
+          ctx.strokeStyle = '#475569';
           ctx.lineWidth = 2;
           ctx.strokeRect(i * slotWidth, slotY, slotWidth, slotHeight);
 
