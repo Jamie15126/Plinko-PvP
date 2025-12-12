@@ -206,7 +206,7 @@
         backdrop-filter: blur(10px);
         width: clamp(250px, 20vw, 300px);
         color: white;
-        transition: right 0.3s ease;
+        transition: right 1.9s ease;
         z-index: 1000;
     }
 
@@ -386,6 +386,7 @@
   let canvasScale = 1;
   const BASE_WIDTH = 600;
   const BASE_HEIGHT = 700;
+  const slotAnimations = [];
 
   canvas.width = 600;
   canvas.height = 700;
@@ -406,6 +407,16 @@
   const audio_plink = new Audio("sounds/plink.mp3");
   const audio_plink_small = new Audio("sounds/plink_small.mp3");
   const audio_plink_small2 = new Audio("sounds/plink_small2.mp3");
+  const audio_money = new Audio("sounds/money.mp3");
+  const audio_loss = new Audio("sounds/loss.mp3");
+  const audio_loss1 = new Audio("sounds/loss1.mp3");
+  const audio_loss2 = new Audio("sounds/loss2.mp3");
+  const audio_loss3 = new Audio("sounds/loss3.mp3");
+  const audio_loss4 = new Audio("sounds/loss4.mp3");
+  const audio_loss5 = new Audio("sounds/loss5.mp3");
+  const audio_sad = new Audio("sounds/sad.mp3");
+  const audio_win = new Audio("sounds/win.mp3");
+  const audio_moving_stone = new Audio("sounds/moving-stone.mp3");
   // audio_plink.play();
 
   let masterVolume = 1.0;
@@ -430,7 +441,63 @@
 
     sound.volume = masterVolume;
     sound.play();
-}
+  }
+
+  function playMoneySound() {
+    let money;
+    money = audio_money.cloneNode();
+    money.volume = masterVolume;
+    money.play();
+  }
+
+  function playCenterSound() {
+    let center;
+    center = audio_loss.cloneNode();
+    center.volume = masterVolume;
+    center.play();
+  }
+
+  function playSad() {
+    let sad;
+    sad = audio_sad.cloneNode();
+    sad.volume = masterVolume / 4;
+    sad.play();
+  }
+
+  function playWin() {
+    let win;
+    win = audio_win.cloneNode();
+    win.volume = masterVolume;
+    win.play();
+  }
+
+  function playMovingStone() {
+    let stone;
+    stone = audio_moving_stone.cloneNode();
+    stone.volume = masterVolume / 2;
+    stone.play();
+  }
+
+  function playRandomLoss() {
+    let loss;
+
+    let randomNumber = Math.random(); // uppercase M
+    if (randomNumber < 0.2) {
+        loss = audio_loss1.cloneNode();
+    } else if (randomNumber < 0.4) {
+        loss = audio_loss2.cloneNode();
+    } else if (randomNumber < 0.6) {
+        loss = audio_loss3.cloneNode();
+    } else if (randomNumber < 0.8) {
+        loss = audio_loss4.cloneNode();
+    } else {
+        loss = audio_loss5.cloneNode();
+    }
+
+    loss.volume = masterVolume / 2;
+    loss.play();
+  }
+
 
   // ===========================================================================
 
@@ -451,17 +518,17 @@
   let isAnimationRunning = false;
 
   const slotConfig = [
-      { id: -5, type: 'jackpot', team: 'red', label: 'JACKPOT' },
+      { id: -5, type: 'jackpot', team: 'red', label: 'P' },
       { id: -4, type: 'points', team: 'red', takePercent: 50, givePercent: 10 },
       { id: -3, type: 'points', team: 'red', takePercent: 40, givePercent: 20 },
       { id: -2, type: 'points', team: 'red', takePercent: 30, givePercent: 30 },
       { id: -1, type: 'points', team: 'red', takePercent: 20, givePercent: 40 },
-      { id: 0, type: 'center', label: 'CENTER' },
+      { id: 0, type: 'center', label: 'C' },
       { id: 1, type: 'points', team: 'blue', takePercent: 20, givePercent: 40 },
       { id: 2, type: 'points', team: 'blue', takePercent: 30, givePercent: 30 },
       { id: 3, type: 'points', team: 'blue', takePercent: 40, givePercent: 20 },
       { id: 4, type: 'points', team: 'blue', takePercent: 50, givePercent: 10 },
-      { id: 5, type: 'jackpot', team: 'blue', label: 'JACKPOT' }
+      { id: 5, type: 'jackpot', team: 'blue', label: 'P' }
   ];
 
   document.addEventListener('keydown', (e) => {
@@ -529,9 +596,31 @@
       }
   }
 
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function triggerSlotBounce(index) {
+    slotAnimations[index] = {
+        startTime: performance.now(),
+        duration: 200 // ms
+    };
+  }
+
   function toggleHousePanel() {
     const panel = document.getElementById('housePanel');
     panel.classList.toggle('open');
+    playMovingStone();
   }
 
   class Ball {
@@ -608,15 +697,30 @@
 
               if (Math.abs(this.vx) < 0.5 && Math.abs(this.vy) < 0.5) {
                   if (this.active) {
-                      const slotIndex = Math.floor(this.x / (canvas.width / slotConfig.length));
-                      if (slotIndex >= 0 && slotIndex < slotConfig.length) {
-                          handleSlotLanding(slotConfig[slotIndex], this.team);
-                      }
+
+                      // --- Stable, deterministic slot detection ---
+                      const slotWidth = canvas.width / slotConfig.length;
+
+                      // Clamp x inside board
+                      const clampedX = Math.max(0, Math.min(canvas.width - 1, this.x));
+
+                      // Compute slot index
+                      let slotIndex = Math.floor(clampedX / slotWidth);
+
+                      // Hard clamp in case of floating-point drift
+                      if (slotIndex < 0) slotIndex = 0;
+                      if (slotIndex >= slotConfig.length) slotIndex = slotConfig.length - 1;
+
+                      const slot = slotConfig[slotIndex];
+                      handleSlotLanding(slot, this.team);
+
+                      // deactivate ball
                       this.active = false;
                       delete boostUsed[this.id];
+
                       setTimeout(() => {
-                          activeBalls = activeBalls.filter(ball => ball !== this);
-                          updateUI();
+                        activeBalls = activeBalls.filter(ball => ball !== this);
+                        updateUI();
                       }, 100);
                   }
               }
@@ -640,6 +744,7 @@
       const bet = currentBet;
 
       if (slot.type === 'jackpot') {
+          playWin();
           if (team === 'red') {
               redBalance += pot + bet;
           } else {
@@ -648,6 +753,7 @@
           showMessage(`JACKPOT! +$${pot}`, slot.team);
           pot = 0;
       } else if (slot.type === 'center') {
+          playCenterSound();
           const playerReturn = Math.floor(bet * 0.5);
           const potAmount = Math.floor(bet * 0.45);
           const houseAmount = Math.floor(bet * 0.05);
@@ -665,6 +771,7 @@
           const isOwnSide = (team === slot.team);
 
           if (isOwnSide) {
+              playRandomLoss();
               const giveAmount = Math.floor(bet * slot.givePercent / 100);
               const keepAmount = bet - giveAmount;
 
@@ -681,6 +788,7 @@
 
               showMessage(`${team.toUpperCase()} gives $${giveAmount}`, team);
           } else {
+              playMoneySound();
               const takeAmount = Math.floor(bet * slot.takePercent / 100);
 
               if (team === 'red') {
@@ -747,17 +855,67 @@
       }, 2000);
   }
 
+  function loseMessage(team) {
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.zIndex = '10000';
+    overlay.style.transition = 'opacity 0.5s';
+    overlay.style.opacity = '1';
+    overlay.style.fontFamily = 'Arial, sans-serif';
+
+    // Background by team
+    if (team === 'Red') {
+        overlay.style.background = 'rgba(10, 0, 0, 0.85)';
+        overlay.style.color = 'rgba(255, 100, 100, 1)';
+    } else if (team === 'Blue') {
+        overlay.style.background = 'rgba(0, 0, 10, 0.85)';
+        overlay.style.color = 'rgba(100, 150, 255, 1)';
+    } else {
+        overlay.style.background = 'rgba(0,0,0,0.85)';
+        overlay.style.color = 'white';
+    }
+
+    const messageDiv = document.createElement('div');
+    messageDiv.textContent = `${team} Team Ran Out Of Money :(`;
+    messageDiv.style.fontSize = '48px';
+    messageDiv.style.fontWeight = 'bold';
+    messageDiv.style.textAlign = 'center';
+    messageDiv.style.textShadow = '0 0 20px rgba(0,0,0,1)';
+    messageDiv.style.padding = '20px 40px';
+    messageDiv.style.borderRadius = '15px';
+    messageDiv.style.boxShadow = '0 10px 40px rgba(0,0,0,0)';
+
+    overlay.appendChild(messageDiv);
+    document.body.appendChild(overlay);
+
+    // Fade out after 4 seconds
+    setTimeout(() => {
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.remove(), 500);
+    }, 4000);
+  }
+
+
   function dropBothBalls() {
       if (activeBalls.length > 0) return;
 
       const bet = Math.max(1, parseInt(document.getElementById('betAmount').value) || 100);
 
       if (redBalance < bet) {
-          showMessage('Red Team: Insufficient balance!', 'red');
+          loseMessage('Red')
+          playSad();
           return;
       }
       if (blueBalance < bet) {
-          showMessage('Blue Team: Insufficient balance!', 'blue');
+          playSad();
+          loseMessage('Blue')
           return;
       }
 
@@ -965,46 +1123,66 @@
   }
 
   function drawSlots() {
-      const slotHeight = 60;
-      const slotY = canvas.height - slotHeight;
-      const slotWidth = canvas.width / slotConfig.length;
+    const slotHeight = 70;
+    const slotY = canvas.height - slotHeight;
+    const slotWidth = canvas.width / slotConfig.length;
 
-      slotConfig.forEach((slot, i) => {
-          let bgColor;
-          if (slot.type === 'jackpot') {
-              bgColor = slot.team === 'red' ? '#ff6b6b' : '#4ecdc4';
-          } else if (slot.type === 'center') {
-              bgColor = '#f39c12';
-          } else {
-              bgColor = slot.team === 'red' ? '#994444' : '#2e7d79';
-          }
+    slotConfig.forEach((slot, i) => {
+        let bgColor;
 
-          ctx.fillStyle = bgColor;
-          ctx.fillRect(i * slotWidth, slotY, slotWidth, slotHeight);
+        // Background by type
+        if (slot.type === 'jackpot') {
+            bgColor = slot.team === 'red' ? '#ff6b6b' : '#4ecdc4';
+        } else if (slot.type === 'center') {
+            bgColor = '#f5a623';
+        } else {
+            bgColor = slot.team === 'red' ? '#aa4444' : '#2e7d79';
+        }
 
-          ctx.strokeStyle = '#475569';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(i * slotWidth, slotY, slotWidth, slotHeight);
+        // Draw rectangle
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(i * slotWidth, slotY, slotWidth, slotHeight);
 
-          ctx.fillStyle = '#ffffff';
-          ctx.font = slot.type === 'jackpot' ? 'bold 11px Arial' : 'bold 10px Arial';
-          ctx.textAlign = 'center';
+        ctx.strokeStyle = '#1f2937';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(i * slotWidth, slotY, slotWidth, slotHeight);
 
-          if (slot.type === 'jackpot') {
-              ctx.fillText('', i * slotWidth + slotWidth / 2, slotY + 18);
-              ctx.font = 'bold 9px Arial';
-              ctx.fillText('POT', i * slotWidth + slotWidth / 2, slotY + 32);
-          } else if (slot.type === 'center') {
-              ctx.fillText('', i * slotWidth + slotWidth / 2, slotY + 20);
-              ctx.font = 'bold 9px Arial';
-              ctx.fillText('50%', i * slotWidth + slotWidth / 2, slotY + 35);
-          } else {
-              ctx.font = 'bold 9px Arial';
-              ctx.fillText(`T:${slot.takePercent}%`, i * slotWidth + slotWidth / 2, slotY + 22);
-              ctx.fillText(`G:${slot.givePercent}%`, i * slotWidth + slotWidth / 2, slotY + 35);
-          }
-      });
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+
+        const cx = i * slotWidth + slotWidth / 2;
+
+        // --- Short Label System ---
+        if (slot.type === 'jackpot') {
+            // P = Pot (Jackpot)
+            ctx.font = 'bold 20px Arial';
+            ctx.fillText('P', cx, slotY + 42);
+
+        } else if (slot.type === 'center') {
+            // C = Center
+            ctx.font = 'bold 20px Arial';
+            ctx.fillText('C', cx, slotY + 42);
+
+        } else if (slot.type === 'points') {
+            // Map takePercent to a single-digit rank (4–1)
+            // These match your game pattern:
+            // 50 → 4
+            // 40 → 3
+            // 30 → 2
+            // 20 → 1
+            let rank = 1;
+            if (slot.takePercent === 50) rank = 50;
+            else if (slot.takePercent === 40) rank = 30;
+            else if (slot.takePercent === 30) rank = 30;
+            else if (slot.takePercent === 20) rank = 20;
+
+            ctx.font = 'bold 20px Arial';
+            ctx.fillText(rank.toString()+ `%`, cx, slotY + 42);
+        }
+    });
   }
+
+
 
   function startAnimation() {
       isAnimationRunning = true;
@@ -1020,6 +1198,21 @@
           animationFrameId = null;
       }
   }
+
+  function shadeColor(color, percent) {
+    const num = parseInt(color.slice(1), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = (num >> 8 & 0x00FF) + amt;
+    const B = (num & 0x0000FF) + amt;
+    return "#" + (
+        0x1000000 +
+        (R < 255 ? (R < 0 ? 0 : R) : 255) * 0x10000 +
+        (G < 255 ? (G < 0 ? 0 : G) : 255) * 0x100 +
+        (B < 255 ? (B < 0 ? 0 : B) : 255)
+    ).toString(16).slice(1);
+  }
+
 
   function gameLoop(currentTime) {
       if (!isAnimationRunning) return;
