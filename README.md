@@ -30,6 +30,11 @@ You can also set the bet amount per ball.
 - Color themes? Likely would be stored in a .yml file and referenced by the HTML.
 - Sounds, musics and effects.
 - Better Horizontal Screen Usage. No plans for a mobile version.
+- Would be interesting to use something like this: https://github.com/plinko-team/plinko
 
 ### Warnings: 
 - Sounds might not work depending on browser settings.
+
+### Credits:
+- The concept and design 100% by me. Anyone is free to use this however they wish under the condition that credit of the original Player vs Player style of plinko is award to Jamie.
+- Color Scheme inpired by https://github.com/AnsonH/plinko-game
