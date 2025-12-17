@@ -1,4 +1,4 @@
-# Plinko-PvP
+# 2 Player Plinko
 
 ## Play here: https://jamie15126.github.io/Plinko-PvP/
 
