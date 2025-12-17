@@ -33,7 +33,7 @@ In the house controls tab there is an Export Data button. It generates a CSV fil
 - Color themes? Likely would be stored in a .yml file and referenced by the HTML.
 - Better Horizontal Screen Usage. No plans for a mobile version.
 - Would be interesting to use something like this: https://github.com/plinko-team/plinko
-- **Multiplayer:**
+- **Online Multiplayer:**
   - MySQL database polling for data synchronization.
   - Host players computer runs similution and game computations.
   - Database not provided.
