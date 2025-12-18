@@ -14,10 +14,23 @@
       box-sizing: border-box;
     }
 
+    html {
+      height: 100%;
+      width: 100%;
+    }
+
     body {
       font-family: 'Arial', sans-serif;
       background: linear-gradient(135deg, #0f1419 0%, #1e293b 50%, #0f1419 100%);
+      background-attachment: fixed;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       min-height: 100vh;
+      height: 100vh;
+      width: 100vw;
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -38,17 +51,17 @@
 
     @keyframes float {
       0% {
-        transform: translateY(100vh) translateX(0);
+        transform: translateY(0) translateX(0);
         opacity: 0;
       }
-      10% {
+      5% {
         opacity: 1;
       }
-      90% {
+      95% {
         opacity: 1;
       }
       100% {
-        transform: translateY(-20vh) translateX(50px);
+        transform: translateY(-120vh) translateX(50px);
         opacity: 0;
       }
     }
@@ -60,30 +73,32 @@
       padding: 40px 20px;
       max-width: 1200px;
       width: 100%;
+      margin: 0 auto;
     }
 
     .logo {
-      margin-bottom: 20px;
+      margin-bottom: clamp(10px, 2vh, 30px);
       animation: fadeInDown 1s ease-out;
     }
 
     .logo h1 {
       font-family: 'Bungee', cursive;
-      font-size: clamp(48px, 8vw, 96px);
+      font-size: clamp(40px, 7vw, 110px);
       background: linear-gradient(135deg, #f39c12 0%, #f1c40f 50%, #e67e22 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       text-shadow: 0 4px 30px rgba(243, 156, 18, 0.5);
-      letter-spacing: 4px;
-      margin-bottom: 10px;
+      letter-spacing: clamp(2px, 0.3vw, 6px);
+      margin-bottom: clamp(5px, 1vh, 15px);
+      line-height: 1.1;
     }
 
     .logo p {
       font-family: 'Righteous', cursive;
-      font-size: clamp(18px, 3vw, 28px);
+      font-size: clamp(14px, 2vw, 32px);
       color: rgba(255, 255, 255, 0.8);
-      letter-spacing: 2px;
+      letter-spacing: clamp(1px, 0.15vw, 3px);
       text-transform: uppercase;
     }
 
@@ -100,11 +115,11 @@
 
     .mode-selector {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 30px;
-      margin-top: 60px;
-      padding: 0 20px;
-      max-width: 1000px;
+      grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 25vw, 350px), 1fr));
+      gap: clamp(20px, 2vw, 40px);
+      margin-top: clamp(30px, 4vh, 80px);
+      padding: 0 clamp(10px, 2vw, 30px);
+      max-width: 1400px;
       margin-left: auto;
       margin-right: auto;
     }
@@ -113,13 +128,17 @@
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(10px);
       border: 2px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      padding: 40px 30px;
+      border-radius: clamp(15px, 1.5vw, 25px);
+      padding: clamp(25px, 3vh, 50px) clamp(20px, 2vw, 40px);
       cursor: pointer;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       position: relative;
       overflow: hidden;
       animation: fadeInUp 0.8s ease-out backwards;
+      min-height: clamp(400px, 45vh, 550px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
     .mode-card:nth-child(1) {
@@ -183,8 +202,8 @@
     }
 
     .mode-icon {
-      font-size: 72px;
-      margin-bottom: 20px;
+      font-size: clamp(48px, 5vw, 84px);
+      margin-bottom: clamp(15px, 2vh, 25px);
       display: block;
       filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.3));
       transition: transform 0.4s ease;
@@ -196,10 +215,10 @@
 
     .mode-title {
       font-family: 'Righteous', cursive;
-      font-size: 28px;
+      font-size: clamp(22px, 2vw, 32px);
       color: white;
-      margin-bottom: 15px;
-      letter-spacing: 1px;
+      margin-bottom: clamp(10px, 1.5vh, 20px);
+      letter-spacing: clamp(0.5px, 0.08vw, 1.5px);
     }
 
     .mode-card.local .mode-title {
@@ -215,24 +234,25 @@
     }
 
     .mode-description {
-      font-size: 16px;
+      font-size: clamp(14px, 1.2vw, 18px);
       color: rgba(255, 255, 255, 0.7);
       line-height: 1.6;
-      margin-bottom: 20px;
+      margin-bottom: clamp(15px, 2vh, 25px);
     }
 
     .mode-features {
       list-style: none;
-      margin: 20px 0;
+      margin: clamp(15px, 2vh, 25px) 0;
       padding: 0;
     }
 
     .mode-features li {
-      font-size: 14px;
+      font-size: clamp(12px, 1vw, 16px);
       color: rgba(255, 255, 255, 0.6);
-      margin: 8px 0;
-      padding-left: 20px;
+      margin: clamp(6px, 0.8vh, 10px) 0;
+      padding-left: clamp(18px, 1.5vw, 24px);
       position: relative;
+      line-height: 1.4;
     }
 
     .mode-features li::before {
@@ -240,6 +260,7 @@
       position: absolute;
       left: 0;
       font-weight: bold;
+      font-size: clamp(14px, 1.2vw, 18px);
     }
 
     .mode-card.local .mode-features li::before {
@@ -256,16 +277,16 @@
 
     .mode-button {
       display: inline-block;
-      padding: 15px 40px;
+      padding: clamp(12px, 1.2vh, 18px) clamp(30px, 3vw, 50px);
       border: none;
-      border-radius: 30px;
-      font-size: 16px;
+      border-radius: clamp(20px, 2vw, 35px);
+      font-size: clamp(14px, 1.2vw, 18px);
       font-weight: bold;
       color: white;
       cursor: pointer;
       transition: all 0.3s ease;
       text-decoration: none;
-      margin-top: 10px;
+      margin-top: clamp(8px, 1vh, 15px);
       position: relative;
       overflow: hidden;
     }
@@ -313,11 +334,15 @@
     .footer {
       position: relative;
       z-index: 10;
-      margin-top: 60px;
-      padding: 20px;
+      margin-top: clamp(30px, 4vh, 80px);
+      padding: clamp(15px, 2vh, 30px);
       text-align: center;
       color: rgba(255, 255, 255, 0.5);
-      font-size: 14px;
+      font-size: clamp(12px, 1vw, 16px);
+    }
+
+    .footer p {
+      margin: clamp(5px, 0.5vh, 10px) 0;
     }
 
     .footer a {
@@ -354,31 +379,32 @@
     .glow-orb {
       position: absolute;
       border-radius: 50%;
-      filter: blur(60px);
+      filter: blur(clamp(40px, 5vw, 80px));
       opacity: 0.3;
       animation: pulse 8s ease-in-out infinite;
+      pointer-events: none;
     }
 
     .glow-orb.yellow {
-      width: 400px;
-      height: 400px;
+      width: clamp(250px, 30vw, 500px);
+      height: clamp(250px, 30vw, 500px);
       background: #f39c12;
-      top: -200px;
-      left: -200px;
+      top: clamp(-150px, -15vw, -250px);
+      left: clamp(-150px, -15vw, -250px);
     }
 
     .glow-orb.blue {
-      width: 500px;
-      height: 500px;
+      width: clamp(300px, 35vw, 600px);
+      height: clamp(300px, 35vw, 600px);
       background: #4ecdc4;
-      bottom: -250px;
-      right: -250px;
+      bottom: clamp(-200px, -18vw, -350px);
+      right: clamp(-200px, -18vw, -350px);
       animation-delay: 2s;
     }
 
     .glow-orb.red {
-      width: 350px;
-      height: 350px;
+      width: clamp(200px, 25vw, 450px);
+      height: clamp(200px, 25vw, 450px);
       background: #ff6b6b;
       top: 50%;
       left: 50%;
@@ -387,6 +413,36 @@
     }
 
     @keyframes pulse {
+      0%, 100% {
+        transform: scale(1) translate(-50%, -50%);
+        opacity: 0.3;
+      }
+      50% {
+        transform: scale(1.2) translate(-50%, -50%);
+        opacity: 0.2;
+      }
+    }
+
+    .glow-orb.yellow {
+      animation-name: pulseYellow;
+    }
+
+    .glow-orb.blue {
+      animation-name: pulseBlue;
+    }
+
+    @keyframes pulseYellow {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.3;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 0.2;
+      }
+    }
+
+    @keyframes pulseBlue {
       0%, 100% {
         transform: scale(1);
         opacity: 0.3;
@@ -484,8 +540,7 @@
       const particle = document.createElement('div');
       particle.className = 'particle';
       particle.style.left = Math.random() * 100 + '%';
-      particle.style.bottom = '0';
-      particle.style.top = 'auto';
+      particle.style.top = '100vh';
       particle.style.animationDelay = Math.random() * 20 + 's';
       particle.style.animationDuration = (15 + Math.random() * 10) + 's';
       container.appendChild(particle);
@@ -512,12 +567,33 @@
 
   // Add subtle parallax effect on mouse move
   document.addEventListener('mousemove', (e) => {
-    const moveX = (e.clientX - window.innerWidth / 2) / 50;
-    const moveY = (e.clientY - window.innerHeight / 2) / 50;
+    const moveX = (e.clientX - window.innerWidth / 2) / 30;
+    const moveY = (e.clientY - window.innerHeight / 2) / 30;
 
     document.querySelectorAll('.glow-orb').forEach((orb, index) => {
-      const speed = 1 + index * 0.5;
-      orb.style.transform = `translate(${moveX * speed}px, ${moveY * speed}px)`;
+      const speed = 1 + index * 0.3;
+      if (orb.classList.contains('red')) {
+        // Red orb keeps centered transform
+        orb.style.transform = `translate(calc(-50% + ${moveX * speed}px), calc(-50% + ${moveY * speed}px))`;
+      } else {
+        orb.style.transform = `translate(${moveX * speed}px, ${moveY * speed}px)`;
+      }
+    });
+
+    // Add subtle card tilt on hover
+    document.querySelectorAll('.mode-card').forEach(card => {
+      const rect = card.getBoundingClientRect();
+      const cardCenterX = rect.left + rect.width / 2;
+      const cardCenterY = rect.top + rect.height / 2;
+      const deltaX = (e.clientX - cardCenterX) / rect.width;
+      const deltaY = (e.clientY - cardCenterY) / rect.height;
+
+      if (rect.left < e.clientX && e.clientX < rect.right &&
+          rect.top < e.clientY && e.clientY < rect.bottom) {
+        card.style.transform = `perspective(1000px) rotateY(${deltaX * 5}deg) rotateX(${-deltaY * 5}deg) translateY(-10px) scale(1.02)`;
+      } else {
+        card.style.transform = '';
+      }
     });
   });
 </script>
