@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plinko PvP - Multiplayer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="title">
+  Plinko PvP
+</div>
+
+<!-- Connection Modal -->
+<div id="connectionModal" class="modal">
+  <div class="modal-content">
+    <h2>🎮 Multiplayer Setup</h2>
+
+    <div class="connection-mode">
+      <button class="mode-btn host-btn" onclick="startHosting()">
+        <div class="mode-icon">🎯</div>
+        <div class="mode-title">Host Game</div>
+        <div class="mode-desc">Create a game and share the link</div>
+      </button>
+
+      <button class="mode-btn join-btn" onclick="showJoinInterface()">
+        <div class="mode-icon">🔗</div>
+        <div class="mode-title">Join Game</div>
+        <div class="mode-desc">Enter host's offer to connect</div>
+      </button>
+
+      <button class="mode-btn local-btn" onclick="startLocalGame()">
+        <div class="mode-icon">🏠</div>
+        <div class="mode-title">Local Game</div>
+        <div class="mode-desc">Play on the same device</div>
+      </button>
+    </div>
+
+    <!-- Host Interface -->
+    <div id="hostInterface" class="connection-interface" style="display: none;">
+      <h3>🎯 You are hosting</h3>
+      <div class="status-message" id="hostStatus">Generating connection offer...</div>
+
+      <div class="connection-box">
+        <label>Share this offer with Player 2:</label>
+        <textarea id="hostOffer" readonly></textarea>
+        <button onclick="copyOffer()" class="copy-btn">📋 Copy Offer</button>
+      </div>
+
+      <div class="connection-box" id="hostAnswerBox" style="display: none;">
+        <label>Paste Player 2's answer here:</label>
+        <textarea id="hostAnswer" placeholder="Paste the answer from Player 2"></textarea>
+        <button onclick="submitAnswer()" class="submit-btn">✓ Connect</button>
+      </div>
+
+      <div class="team-selection" id="hostTeamSelection" style="display: none;">
+        <label>Choose your team:</label>
+        <div class="team-buttons">
+          <button onclick="selectTeam('red')" class="team-select-btn red-team">🔴 Red Team</button>
+          <button onclick="selectTeam('blue')" class="team-select-btn blue-team">🔵 Blue Team</button>
+        </div>
+      </div>
+
+      <button onclick="cancelConnection()" class="cancel-btn">Cancel</button>
+    </div>
+
+    <!-- Join Interface -->
+    <div id="joinInterface" class="connection-interface" style="display: none;">
+      <h3>🔗 Join a Game</h3>
+      <div class="status-message" id="joinStatus">Waiting for host's offer...</div>
+
+      <div class="connection-box">
+        <label>Paste the host's offer here:</label>
+        <textarea id="joinOffer" placeholder="Paste the host's offer"></textarea>
+        <button onclick="submitOffer()" class="submit-btn">Generate Answer</button>
+      </div>
+
+      <div class="connection-box" id="joinAnswerBox" style="display: none;">
+        <label>Send this answer back to the host:</label>
+        <textarea id="joinAnswer" readonly></textarea>
+        <button onclick="copyAnswer()" class="copy-btn">📋 Copy Answer</button>
+        <div class="waiting-message">Waiting for host to complete connection...</div>
+      </div>
+
+      <button onclick="cancelConnection()" class="cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Connection Status Bar -->
+<div id="connectionStatus" class="connection-status" style="display: none;">
+  <span id="statusText">Connected</span>
+  <span id="playerRole"></span>
+  <button onclick="disconnect()" class="disconnect-btn">Disconnect</button>
+</div>
+
+<div class="game-container">
+  <div class="teams">
+    <div class="team team-red">
+      <h2>Red Team</h2>
+      <div class="player-indicator" id="redPlayerIndicator"></div>
+      <div class="label">Balance</div>
+      <div class="balance" id="redBalance">$500</div>
+    </div>
+    <div class="pot">
+      <div>💰 POT</div>
+      <div class="amount" id="potAmount">$0</div>
+    </div>
+    <div class="team team-blue">
+      <h2>Blue Team</h2>
+      <div class="player-indicator" id="bluePlayerIndicator"></div>
+      <div class="label">Balance</div>
+      <div class="balance" id="blueBalance">$500</div>
+    </div>
+  </div>
+
+  <canvas id="canvas"></canvas>
+
+  <div class="controls">
+    <div class="bet-input">
+      <label>Bet Amount:</label>
+      <input type="number" id="betAmount" value="100" min="1" max="1000">
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="drop-btn" onclick="dropBothBalls()" id="dropBtn">Start Round ($<span id="betDisplay">100</span> each)</button>
+    <button class="reset-btn" onclick="reset()">Reset Game</button>
+  </div>
+</div>
+
+<div class="house" id="housePanel">
+  <div class="house-tab" onclick="toggleHousePanel()">HOUSE</div>
+  <div class="house-controls"> House Controls:</div>
+  <div class="house-selection">
+    <label for="house-teams">Choose a Team:</label>
+    <select name="teams" id="house-teams">
+      <option value="red">red</option>
+      <option value="blue">blue</option>
+    </select>
+  </div>
+  <div class="change-input">
+    <label><strong>Balance Amount:</strong></label>
+    <input type="number" id="house-amount" value="100" min="1" max="10000">
+  </div>
+  <button class="set-bal-btn" onclick="setBalance()" id="setBalBtn">Set Balance</button>
+  <div class="house-bal">
+    <div>House Balance</div>
+    <div class="amount" id="house-bal">$0</div>
+  </div>
+</div>
+
+<div id="audio-slider-container">
+  <div class="audio-label">Volume</div>
+  <input id="audio-slider" type="range" min="0" max="100" value="100" orient="vertical">
+  <div id="audio-value">100</div>
+</div>
+
+<script src="webrtc.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

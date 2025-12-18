@@ -2,11 +2,11 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 let canvasScale = 1;
-const BASE_WIDTH = 675;
+const BASE_WIDTH = 600;
 const BASE_HEIGHT = 675;
 const slotBounces = [];
 
-canvas.width = 675;
+canvas.width = 600;
 canvas.height = 675;
 
 const FIXED_FPS = 60;
@@ -15,8 +15,8 @@ const GRAVITY = 0.4 * (60 / FIXED_FPS);
 const BOUNCE = 0.6;
 const FRICTION = 0.98;
 const PEG_RADIUS = 5;
-const BALL_RADIUS = 10;
-const BOOST_LINE = 300;
+const BALL_RADIUS = 8;
+const BOOST_LINE = 350;
 const BOOST_LINE_UPPER = 150;
 const BOOST_FORCE = 8 * (60 / FIXED_FPS);
 
@@ -138,36 +138,52 @@ document.addEventListener('keydown', (e) => {
         dropBothBalls();
     } else if (e.code === 'ArrowLeft') {
         e.preventDefault();
-        boost('b_left');
-        updateUI();
+        if (window.isMyTeam && window.isMyTeam('blue')) {
+            boost('b_left');
+            updateUI();
+        }
     } else if (e.code === 'ArrowRight') {
         e.preventDefault();
-        boost('b_right');
-        updateUI();
+        if (window.isMyTeam && window.isMyTeam('blue')) {
+            boost('b_right');
+            updateUI();
+        }
     } else if (e.code === 'ArrowUp') {
         e.preventDefault();
-        boost('b_up');
-        updateUI();
+        if (window.isMyTeam && window.isMyTeam('blue')) {
+            boost('b_up');
+            updateUI();
+        }
     } else if (e.code === 'ArrowDown') {
         e.preventDefault();
-        boost('b_down');
-        updateUI();
+        if (window.isMyTeam && window.isMyTeam('blue')) {
+            boost('b_down');
+            updateUI();
+        }
     } else if (e.code === 'KeyA') {
         e.preventDefault();
-        boost('r_left');
-        updateUI();
+        if (window.isMyTeam && window.isMyTeam('red')) {
+            boost('r_left');
+            updateUI();
+        }
     } else if (e.code === 'KeyD') {
         e.preventDefault();
-        boost('r_right');
-        updateUI();
+        if (window.isMyTeam && window.isMyTeam('red')) {
+            boost('r_right');
+            updateUI();
+        }
     } else if (e.code === 'KeyW') {
         e.preventDefault();
-        boost('r_up');
-        updateUI();
+        if (window.isMyTeam && window.isMyTeam('red')) {
+            boost('r_up');
+            updateUI();
+        }
     } else if (e.code === 'KeyS') {
         e.preventDefault();
-        boost('r_down');
-        updateUI();
+        if (window.isMyTeam && window.isMyTeam('red')) {
+            boost('r_down');
+            updateUI();
+        }
     }
 });
 
@@ -177,10 +193,10 @@ document.getElementById('betAmount').addEventListener('input', function() {
 });
 
 function initPegs() {
-    const rows = 10;
-    const startY = 90;
-    const rowSpacing = 53;
-    const pegSpacing = 57;
+    const rows = 12;
+    const startY = 100;
+    const rowSpacing = 45;
+    const pegSpacing = 45;
 
     for (let row = 0; row < rows; row++) {
         const pegsInRow = row + 3;
@@ -254,8 +270,6 @@ class Ball {
                 this.y = targetY;
 
                 const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-                const minSpeed = 2; // tweak to control how fast balls slide off
-                const newSpeed = Math.max(speed * BOUNCE, minSpeed);
                 this.vx = Math.cos(angle) * speed * BOUNCE;
                 this.vy = Math.sin(angle) * speed * BOUNCE;
 
@@ -397,6 +411,11 @@ function handleSlotLanding(slot, team) {
     }
 
     updateUI();
+
+    // Sync game state in multiplayer
+    if (window.isMultiplayer && window.isMultiplayer() && window.isGameHost && window.isGameHost()) {
+        syncGameState();
+    }
 }
 
 function showMessage(text, team) {
@@ -517,55 +536,144 @@ function dropBothBalls() {
     }
 
     updateUI();
+
+    // Sync ball drop in multiplayer (only host sends)
+    if (window.isMultiplayer && window.isMultiplayer() && window.isGameHost && window.isGameHost()) {
+        window.sendGameMessage({
+            type: 'ballDrop',
+            data: {
+                bet: bet,
+                redBallId: redBallId,
+                blueBallId: blueBallId,
+                timestamp: Date.now()
+            }
+        });
+    }
 }
+
+// Handle remote ball drop (for non-host players)
+window.handleRemoteBallDrop = function(data) {
+    if (activeBalls.length > 0) return;
+
+    redBalance -= data.bet;
+    blueBalance -= data.bet;
+    currentBet = data.bet;
+
+    const redBall = new Ball(canvas.width / 2 - 20, 20, 'red', data.redBallId);
+    const blueBall = new Ball(canvas.width / 2 + 20, 20, 'blue', data.blueBallId);
+
+    activeBalls.push(redBall, blueBall);
+    boostUsed[data.redBallId] = false;
+    boostUsed[data.blueBallId] = false;
+
+    if (!isAnimationRunning) {
+        startAnimation();
+    }
+
+    updateUI();
+};
 
 function boost(direction) {
     for (const ball of activeBalls) {
         if (!ball.active || boostUsed[ball.id] || ball.y > BOOST_LINE || ball.y < BOOST_LINE_UPPER) continue;
 
+        let boosted = false;
+        let boostTeam = null;
+
         if (direction === 'b_left' && ball.team === 'blue') {
             ball.vx -= BOOST_FORCE;
             boostUsed[ball.id] = true;
+            boosted = true;
+            boostTeam = 'blue';
             showMessage('BOOST!', 'blue');
             break;
         } else if (direction === 'b_right' && ball.team === 'blue') {
             ball.vx += BOOST_FORCE;
             boostUsed[ball.id] = true;
+            boosted = true;
+            boostTeam = 'blue';
             showMessage('BOOST!', 'blue');
             break;
         } else if (direction === 'b_up' && ball.team === 'blue') {
             ball.vy -= BOOST_FORCE;
             boostUsed[ball.id] = true;
+            boosted = true;
+            boostTeam = 'blue';
             showMessage('BOOST!', 'blue');
             break;
         } else if (direction === 'b_down' && ball.team === 'blue') {
             ball.vy += BOOST_FORCE;
             boostUsed[ball.id] = true;
+            boosted = true;
+            boostTeam = 'blue';
             showMessage('BOOST!', 'blue');
             break;
         } else if (direction === 'r_left' && ball.team === 'red') {
             ball.vx -= BOOST_FORCE;
             boostUsed[ball.id] = true;
+            boosted = true;
+            boostTeam = 'red';
             showMessage('BOOST!', 'red');
             break;
         } else if (direction === 'r_right' && ball.team === 'red') {
             ball.vx += BOOST_FORCE;
             boostUsed[ball.id] = true;
+            boosted = true;
+            boostTeam = 'red';
             showMessage('BOOST!', 'red');
             break;
         } else if (direction === 'r_up' && ball.team === 'red') {
             ball.vy -= BOOST_FORCE;
             boostUsed[ball.id] = true;
+            boosted = true;
+            boostTeam = 'red';
             showMessage('BOOST!', 'red');
             break;
         } else if (direction === 'r_down' && ball.team === 'red') {
             ball.vy += BOOST_FORCE;
             boostUsed[ball.id] = true;
+            boosted = true;
+            boostTeam = 'red';
             showMessage('BOOST!', 'red');
             break;
         }
+
+        // Send boost to opponent in multiplayer
+        if (boosted && window.isMultiplayer && window.isMultiplayer()) {
+            window.sendGameMessage({
+                type: 'boost',
+                data: {
+                    direction: direction,
+                    ballId: ball.id,
+                    team: boostTeam
+                }
+            });
+        }
     }
 }
+
+// Handle remote boost
+window.handleRemoteBoost = function(data) {
+    for (const ball of activeBalls) {
+        if (ball.id === data.ballId && ball.active && !boostUsed[ball.id]) {
+            const direction = data.direction;
+
+            if (direction.includes('left')) {
+                ball.vx -= BOOST_FORCE;
+            } else if (direction.includes('right')) {
+                ball.vx += BOOST_FORCE;
+            } else if (direction.includes('up')) {
+                ball.vy -= BOOST_FORCE;
+            } else if (direction.includes('down')) {
+                ball.vy += BOOST_FORCE;
+            }
+
+            boostUsed[ball.id] = true;
+            showMessage('BOOST!', data.team);
+            break;
+        }
+    }
+};
 
 function reset() {
     activeBalls = [];
@@ -574,7 +682,24 @@ function reset() {
     blueBalance = 500;
     pot = 0;
     updateUI();
+
+    // Send reset in multiplayer
+    if (window.isMultiplayer && window.isMultiplayer()) {
+        window.sendGameMessage({
+            type: 'reset'
+        });
+    }
 }
+
+// Handle remote reset
+window.handleRemoteReset = function() {
+    activeBalls = [];
+    boostUsed = {};
+    redBalance = 500;
+    blueBalance = 500;
+    pot = 0;
+    updateUI();
+};
 
 function setBalance() {
     const amount = parseInt(document.getElementById('house-amount').value) || 0;
@@ -587,6 +712,28 @@ function setBalance() {
     }
     updateUI();
 }
+
+function syncGameState() {
+    if (window.sendGameMessage) {
+        window.sendGameMessage({
+            type: 'gameState',
+            data: {
+                redBalance: redBalance,
+                blueBalance: blueBalance,
+                pot: pot,
+                houseTotal: houseTotal
+            }
+        });
+    }
+}
+
+window.handleGameStateSync = function(data) {
+    redBalance = data.redBalance;
+    blueBalance = data.blueBalance;
+    pot = data.pot;
+    houseTotal = data.houseTotal;
+    updateUI();
+};
 
 function updateUI() {
     document.getElementById('redBalance').textContent = '$' + redBalance;
@@ -603,14 +750,12 @@ function updateUI() {
 
     dropBtn.innerHTML = `Start Round ($<span id="betDisplay">${bet}</span> each)`;
 
-    // Only stop animation if no active balls AND no active slot bounces
-    if (activeBalls.length === 0 && slotBounces.length === 0) {
+    if (activeBalls.length === 0) {
         if (isAnimationRunning) {
             stopAnimation();
         }
     }
 }
-
 
 function resizeCanvas() {
   const targetHeight = window.innerHeight * 0.55;
@@ -656,7 +801,7 @@ function drawBoostLine() {
 
     ctx.fillStyle = 'rgba(255, 255, 0, 0.7)';
     ctx.font = 'bold 14px Arial';
-    ctx.fillText('', 50, BOOST_LINE - 10);
+    ctx.fillText('', 50, BOOST_LINE - 5);
 }
 
 function drawBoostLineUpper() {
@@ -672,53 +817,29 @@ function drawBoostLineUpper() {
     ctx.fillStyle = 'rgba(255, 255, 0, 0.7)';
     ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'left';
-    ctx.fillText('BOOST ZONE', 10, BOOST_LINE_UPPER - 10);
-}
-
-function darkenHexColor(hex, factor) {
-    // factor = 0.1 means 10% darker, 0.3 = 30% darker
-    let r = parseInt(hex.slice(1, 3), 16);
-    let g = parseInt(hex.slice(3, 5), 16);
-    let b = parseInt(hex.slice(5, 7), 16);
-
-    r = Math.floor(r * (1 - factor));
-    g = Math.floor(g * (1 - factor));
-    b = Math.floor(b * (1 - factor));
-
-    // ensure two-digit hex
-    const rr = r.toString(16).padStart(2, '0');
-    const gg = g.toString(16).padStart(2, '0');
-    const bb = b.toString(16).padStart(2, '0');
-
-    return `#${rr}${gg}${bb}`;
+    ctx.fillText('BOOST ZONE', 10, BOOST_LINE_UPPER - 5);
 }
 
 function drawSlots() {
   const slotHeight = 50;
-  const slotY = canvas.height - slotHeight - 20;
-  const slotWidth = canvas.width / slotConfig.length - 4;
+  const slotY = canvas.height - slotHeight;
+  const slotWidth = canvas.width / slotConfig.length;
   const cornerRadius = 8;
 
   slotConfig.forEach((slot, i) => {
-      const x = i * slotWidth + 24;
+      const x = i * slotWidth;
       const cx = x + slotWidth / 2;
 
       let bounceOffset = 0;
-
-      // Iterate over all bounces and apply them to this slot
-      for (let j = slotBounces.length - 1; j >= 0; j--) {
-          const bounce = slotBounces[j];
-          if (bounce.index === i) {
-              const elapsed = Date.now() - bounce.startTime;
-              const duration = 200; // Duration of bounce effect
-
-              if (elapsed < duration) {
-                  const progress = elapsed / duration;
-                  bounceOffset += -Math.sin(progress * Math.PI) * 5; // Accumulate bounce offsets
-              } else {
-                  // If bounce is complete, remove it
-                  slotBounces.splice(j, 1);
-              }
+      const bounce = slotBounces.find(b => b.index === i);
+      if (bounce) {
+          const elapsed = Date.now() - bounce.startTime;
+          const duration = 300;
+          if (elapsed < duration) {
+              const progress = elapsed / duration;
+              bounceOffset = Math.sin(progress * Math.PI) * 10;
+          } else {
+              slotBounces.splice(slotBounces.indexOf(bounce), 1);
           }
       }
 
@@ -731,10 +852,6 @@ function drawSlots() {
           bgColor = slot.team === 'red' ? '#aa4444' : '#2e7d79';
       }
 
-      ctx.fillStyle = darkenHexColor(bgColor, 0.3);;
-      roundRect(ctx, x + 2, slotY + 3 - (bounceOffset / 2), slotWidth - 4, slotHeight - 3, cornerRadius);
-      ctx.fill();
-
       ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
       roundRect(ctx, x + 2, slotY + 3 - bounceOffset, slotWidth - 4, slotHeight - 3, cornerRadius);
       ctx.fill();
@@ -743,10 +860,10 @@ function drawSlots() {
       roundRect(ctx, x + 2, slotY - bounceOffset, slotWidth - 4, slotHeight - 6, cornerRadius);
       ctx.fill();
 
-      //ctx.strokeStyle = '#1f2937';
-      //ctx.lineWidth = 2;
-      //roundRect(ctx, x + 2, slotY - bounceOffset, slotWidth - 4, slotHeight - 6, cornerRadius);
-      //ctx.stroke();
+      ctx.strokeStyle = '#1f2937';
+      ctx.lineWidth = 2;
+      roundRect(ctx, x + 2, slotY - bounceOffset, slotWidth - 4, slotHeight - 6, cornerRadius);
+      ctx.stroke();
 
       ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'center';

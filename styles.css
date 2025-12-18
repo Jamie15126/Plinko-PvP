@@ -50,6 +50,7 @@ body {
     text-align: center;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    position: relative;
 }
 
 .team-red {
@@ -77,6 +78,13 @@ body {
     font-size: clamp(11px, 1.1vw, 13px);
     opacity: 0.9;
     text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.player-indicator {
+    font-size: clamp(10px, 1vw, 12px);
+    opacity: 0.85;
+    margin-top: 5px;
+    font-weight: 600;
 }
 
 .pot {
@@ -285,4 +293,323 @@ button:disabled {
     -webkit-appearance: slider-vertical;
     width: 20px;
     height: clamp(120px, 12vh, 150px);
+}
+
+/* Connection Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    padding: 40px;
+    border-radius: 20px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    color: white;
+    animation: modalSlideIn 0.4s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-content h2 {
+    margin: 0 0 30px 0;
+    font-size: 32px;
+    text-align: center;
+    background: linear-gradient(135deg, #f39c12, #f1c40f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.modal-content h3 {
+    margin: 0 0 20px 0;
+    font-size: 24px;
+    text-align: center;
+}
+
+.connection-mode {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.mode-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid transparent;
+    padding: 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+.mode-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(5px);
+}
+
+.host-btn:hover {
+    border-color: #4ecdc4;
+    box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+}
+
+.join-btn:hover {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+}
+
+.local-btn:hover {
+    border-color: #f39c12;
+    box-shadow: 0 0 20px rgba(243, 156, 18, 0.3);
+}
+
+.mode-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.mode-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.mode-desc {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.connection-interface {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.status-message {
+    background: rgba(78, 205, 196, 0.2);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    border: 1px solid rgba(78, 205, 196, 0.4);
+}
+
+.connection-box {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.connection-box label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.connection-box textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-family: monospace;
+    font-size: 12px;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.connection-box textarea:focus {
+    outline: none;
+    border-color: #4ecdc4;
+    box-shadow: 0 0 10px rgba(78, 205, 196, 0.3);
+}
+
+.copy-btn, .submit-btn {
+    background: linear-gradient(135deg, #4ecdc4, #44a3d5);
+    width: 100%;
+    margin-top: 10px;
+}
+
+.copy-btn:hover, .submit-btn:hover {
+    background: linear-gradient(135deg, #44a3d5, #4ecdc4);
+}
+
+.cancel-btn {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    width: 100%;
+    margin-top: 15px;
+}
+
+.waiting-message {
+    margin-top: 15px;
+    text-align: center;
+    font-style: italic;
+    opacity: 0.7;
+    font-size: 14px;
+}
+
+.team-selection {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.team-selection label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.team-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.team-select-btn {
+    flex: 1;
+    padding: 20px;
+    font-size: 18px;
+    border-radius: 12px;
+}
+
+.team-select-btn.red-team {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+}
+
+.team-select-btn.blue-team {
+    background: linear-gradient(135deg, #4ecdc4, #44a3d5);
+}
+
+/* Connection Status Bar */
+.connection-status {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #2d3748, #1a202c);
+    padding: 12px 24px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    z-index: 9998;
+    border: 2px solid rgba(78, 205, 196, 0.5);
+    animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.connection-status span {
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+#statusText {
+    color: #4ecdc4;
+}
+
+.disconnect-btn {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    padding: 6px 16px;
+    font-size: 12px;
+    border-radius: 15px;
+}
+
+.disconnect-btn:hover {
+    background: linear-gradient(135deg, #c0392b, #e74c3c);
+}
+
+.house-selection {
+    margin: 15px 0;
+}
+
+.house-selection label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.house-selection select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.house-selection select:focus {
+    outline: none;
+    border-color: #f39c12;
+}
+
+.change-input {
+    margin: 15px 0;
+}
+
+.change-input label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.change-input input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.change-input input:focus {
+    outline: none;
+    border-color: #f39c12;
 }
