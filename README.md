@@ -42,6 +42,7 @@ In the house controls tab there is an Export Data button. It generates a CSV fil
 ### Warnings: 
 - Sounds might not work depending on browser settings.
 - Rampant } else if ( statements currently cus optimization is for people with slow computers (I'm not good at javascript)
+- Includes *some* AI generated code.
 
 ### Credits:
 - The concept and design 100% by me. Anyone is free to use this however they wish under the condition that credit of the original Player vs Player style of plinko is award to Jamie.
