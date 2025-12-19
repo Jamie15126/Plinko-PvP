@@ -143,6 +143,14 @@ function recordEvent(team, slotID){ //everytime a ball falls in a slot the team 
     localStorage.setItem('plinkoGameData', existingData + row);
 }
 
+function recordNewGame(){ //everytime a ball falls in a slot the team color, slot ID, bet amount, team balance, pot and house balance are recorded as a new row
+    const timestamp = new Date().toISOString();
+    const row = `${timestamp},New Game,-,-,-,-,${pot},${houseTotal}\n`;
+
+    const existingData = localStorage.getItem('plinkoGameData') || '';
+    localStorage.setItem('plinkoGameData', existingData + row);
+}
+
 //===============================================================
 
 const pegs = [];
@@ -162,15 +170,15 @@ let isAnimationRunning = false;
 
 const slotConfig = [
     { id: -5, type: 'jackpot', team: 'red', label: 'P' },
-    { id: -4, type: 'points', team: 'red', takePercent: 50, givePercent: 10 },
-    { id: -3, type: 'points', team: 'red', takePercent: 40, givePercent: 20 },
-    { id: -2, type: 'points', team: 'red', takePercent: 30, givePercent: 30 },
-    { id: -1, type: 'points', team: 'red', takePercent: 20, givePercent: 40 },
+    { id: -4, type: 'points', team: 'red', takePercent: 50, givePercent: 20 },
+    { id: -3, type: 'points', team: 'red', takePercent: 40, givePercent: 30 },
+    { id: -2, type: 'points', team: 'red', takePercent: 30, givePercent: 40 },
+    { id: -1, type: 'points', team: 'red', takePercent: 20, givePercent: 50 },
     { id: 0, type: 'center', label: 'C' },
-    { id: 1, type: 'points', team: 'blue', takePercent: 20, givePercent: 40 },
-    { id: 2, type: 'points', team: 'blue', takePercent: 30, givePercent: 30 },
-    { id: 3, type: 'points', team: 'blue', takePercent: 40, givePercent: 20 },
-    { id: 4, type: 'points', team: 'blue', takePercent: 50, givePercent: 10 },
+    { id: 1, type: 'points', team: 'blue', takePercent: 20, givePercent: 50 },
+    { id: 2, type: 'points', team: 'blue', takePercent: 30, givePercent: 40 },
+    { id: 3, type: 'points', team: 'blue', takePercent: 40, givePercent: 30 },
+    { id: 4, type: 'points', team: 'blue', takePercent: 50, givePercent: 20 },
     { id: 5, type: 'jackpot', team: 'blue', label: 'P' }
 ];
 
@@ -723,7 +731,6 @@ function reset() {
     boostUsed = {};
     redBalance = 500;
     blueBalance = 500;
-    pot = 0;
     updateUI();
 
     // Send reset in multiplayer
@@ -740,7 +747,6 @@ window.handleRemoteReset = function() {
     boostUsed = {};
     redBalance = 500;
     blueBalance = 500;
-    pot = 0;
     updateUI();
 };
 
