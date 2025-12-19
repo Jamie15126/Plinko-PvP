@@ -99,7 +99,7 @@
     <div class="team team-red">
       <h2>Red Team</h2>
       <div class="player-indicator" id="redPlayerIndicator"></div>
-      <div class="label">Balance</div>
+      <!-- <div class="label">Balance</div> -->
       <div class="balance" id="redBalance">$500</div>
     </div>
     <div class="pot">
@@ -109,7 +109,7 @@
     <div class="team team-blue">
       <h2>Blue Team</h2>
       <div class="player-indicator" id="bluePlayerIndicator"></div>
-      <div class="label">Balance</div>
+      <!-- <div class="label">Balance</div> -->
       <div class="balance" id="blueBalance">$500</div>
     </div>
   </div>
@@ -131,7 +131,9 @@
 
 <div class="house" id="housePanel">
   <div class="house-tab" onclick="toggleHousePanel()">HOUSE</div>
-  <div class="house-controls"> House Controls:</div>
+  <div class="house-controls">House Controls:</div>
+
+  <!-- Team Balance Controls -->
   <div class="house-selection">
     <label for="house-teams">Choose a Team:</label>
     <select name="teams" id="house-teams">
@@ -144,9 +146,32 @@
     <input type="number" id="house-amount" value="100" min="1" max="10000">
   </div>
   <button class="set-bal-btn" onclick="setBalance()" id="setBalBtn">Set Balance</button>
+
+  <!-- Pot Controls -->
+  <div class="change-input">
+    <label><strong>Pot Amount:</strong></label>
+    <input type="number" id="pot-amount-input" value="0" min="0" max="100000">
+  </div>
+  <button class="set-pot-btn" onclick="setPot()">Set Pot</button>
+
+  <!-- House Balance Controls -->
+  <div class="change-input">
+    <label><strong>House Balance:</strong></label>
+    <input type="number" id="house-balance-input" value="0" min="0" max="100000">
+  </div>
+  <button class="set-house-btn" onclick="setHouseBalance()">Set House Balance</button>
+
+  <!-- House Balance Display -->
   <div class="house-bal">
     <div>House Balance</div>
     <div class="amount" id="house-bal">$0</div>
+  </div>
+
+  <!-- Data Export Controls -->
+  <div class="data-controls">
+    <h3>Data Management</h3>
+    <button class="export-btn" onclick="exportData()">📥 Export CSV</button>
+    <button class="delete-btn" onclick="deleteLocalStorage()">🗑️ Clear Data</button>
   </div>
 </div>
 

@@ -103,6 +103,48 @@ function playRandomLoss() {
   loss.play();
 }
 
+
+//=====================Data Storage=============================
+
+function csvInit() { //On first run initialize the localStorage CSV
+    if (!localStorage.getItem('plinkoGameData')) {
+        const headers = 'Timestamp,Team,SlotID,BetAmount,RedBalance,BlueBalance,Pot,HouseBalance\n';
+        localStorage.setItem('plinkoGameData', headers);
+    }
+}
+
+function exportData(){ //Generates the a csv file and prompts the user to download it.
+    const csvData = localStorage.getItem('plinkoGameData') || 'Timestamp,Team,SlotID,BetAmount,RedBalance,BlueBalance,Pot,HouseBalance\n';
+
+    const blob = new Blob([csvData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `plinko_game_data_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
+function deleteLocalStorage(){ //Wipes the localStorage
+    if (confirm('Are you sure you want to delete all recorded game data?')) {
+        localStorage.removeItem('plinkoGameData');
+        csvInit();
+        alert('Game data has been cleared!');
+    }
+}
+
+function recordEvent(team, slotID){ //everytime a ball falls in a slot the team color, slot ID, bet amount, team balance, pot and house balance are recorded as a new row
+    const timestamp = new Date().toISOString();
+    const row = `${timestamp},${team},${slotID},${currentBet},${redBalance},${blueBalance},${pot},${houseTotal}\n`;
+
+    const existingData = localStorage.getItem('plinkoGameData') || '';
+    localStorage.setItem('plinkoGameData', existingData + row);
+}
+
+//===============================================================
+
 const pegs = [];
 let activeBalls = [];
 let boostUsed = {};
@@ -340,6 +382,9 @@ class Ball {
 
 function handleSlotLanding(slot, team) {
     const bet = currentBet;
+
+    // Record the event before processing
+    recordEvent(team, slot.id);
 
     if (slot.type === 'jackpot') {
         playWin();
@@ -711,6 +756,18 @@ function setBalance() {
     updateUI();
 }
 
+function setPot() {
+    const amount = parseInt(document.getElementById('pot-amount-input').value) || 0;
+    pot = amount;
+    updateUI();
+}
+
+function setHouseBalance() {
+    const amount = parseInt(document.getElementById('house-balance-input').value) || 0;
+    houseTotal = amount;
+    updateUI();
+}
+
 function syncGameState() {
     if (window.sendGameMessage) {
         window.sendGameMessage({
@@ -952,6 +1009,9 @@ function gameLoop(currentTime) {
 
     animationFrameId = requestAnimationFrame(gameLoop);
 }
+
+// Initialize CSV storage on load
+csvInit();
 
 initPegs();
 updateUI();
