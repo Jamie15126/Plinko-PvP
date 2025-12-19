@@ -114,14 +114,17 @@
     }
 
     .mode-selector {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(clamp(280px, 25vw, 350px), 1fr));
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;          /* don't allow wrapping */
+      justify-content: center;    /* center row on wide screens */
       gap: clamp(20px, 2vw, 40px);
       margin-top: clamp(30px, 4vh, 80px);
       padding: 0 clamp(10px, 2vw, 30px);
       max-width: 1400px;
       margin-left: auto;
       margin-right: auto;
+      overflow-x: auto;           /* allow horizontal scroll on small screens */
     }
 
     .mode-card {
@@ -358,14 +361,14 @@
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .mode-selector {
-        grid-template-columns: 1fr;
-        gap: 20px;
+        /* delete these two lines */
+        /* grid-template-columns: 1fr;
+          gap: 20px; */
       }
 
       .mode-card {
-        padding: 30px 20px;
+        flex: 0 0 clamp(280px, 25vw, 350px);
       }
-
       .logo h1 {
         font-size: 48px;
       }
